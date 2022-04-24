@@ -7,8 +7,15 @@ import static com.narayan.hmsc.util.CommonUtils.println;
 import static com.narayan.hmsc.util.CommonUtils.scanner;
 import static com.narayan.hmsc.util.CommonUtils.showAdminOptions;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
+import com.narayan.hmsc.AdminPatternMatcher.*;
+import com.narayan.hmsc.PatternMatchers.ExitPatternMatcher;
+import com.narayan.hmsc.PatternMatchers.MenuPatternMatcher;
+import com.narayan.hmsc.PatternMatchers.StartAdminModePatternMatcher;
+import com.narayan.hmsc.db.DataBase;
 import com.narayan.hmsc.domain.Doctor;
 import com.narayan.hmsc.domain.User;
 
@@ -19,6 +26,8 @@ import com.narayan.hmsc.domain.User;
  */
 public class AdminMode extends AbstractMode {
 
+	DataBase db = DataBase.getInstance();
+
 	@Override
 	public void operate() {
 
@@ -26,31 +35,49 @@ public class AdminMode extends AbstractMode {
 			showAdminOptions();
 			int option = learnOptionFromUser();
 			println("----------------------------------------\n");
-			switch (option) {
-			case 1:
-				registerDoctor();
-				break;
-			case 2:
-				deleteDoctor();
-				break;
-			case 3:
-				listRegisteredDoctors();
-				break;
-			case 7:
-				logout();
-				break;
-			default:
-				print("\nPlease Choose a valid option : ");
-				operate();
+
+			List<AdminPatternMatcher> adminPatternMatchers = Arrays.asList(new RegisterDoctorPattern(), new DeleteDoctorPattern(),new ListRegisteredDoctorPattern(),new AddReceptionistPattern(),new DeleteReceptionistPattern(),new ListReceptionistPattern(),new LogOutPattern(),new DefaultPattern());
+
+			//switch statement replaced with patternMatcher
+			for(AdminPatternMatcher patternMatcher: adminPatternMatchers){
+				if(patternMatcher.matched(option)){
+					patternMatcher.response();
+				}
 			}
+//			switch (option) {
+//			case 1:
+//				registerDoctor();
+//				break;
+//			case 2:
+//				deleteDoctor();
+//				break;
+//			case 3:
+//				listRegisteredDoctors();
+//				break;
+//			case 4:
+//				addReceptionist();
+//				break;
+//			case 5:
+//				deleteReceptionist();
+//				break;
+//			case 6:
+//				listReceptionist();
+//				break;
+//			case 7:
+//				logout();
+//				break;
+//			default:
+//				print("\nPlease Choose a valid option : ");
+//				operate();
+//			}
 
 		}
 
 	}
 
-	private void listRegisteredDoctors() {
+	public void listRegisteredDoctors() {
 		boolean first = true, doctorsExist = false;
-		for (User u : users) {
+		for (User u : db.users) {
 			if ("doctor".equalsIgnoreCase(u.getType())) {
 				doctorsExist = true;
 				Doctor d = (Doctor) u;
@@ -78,7 +105,7 @@ public class AdminMode extends AbstractMode {
 		operate();
 	}
 
-	private void deleteDoctor() {
+	public void deleteDoctor() {
 		Scanner scan = scanner();
 		print("Enter the doctor Id to delete : ");
 		String docId = scan.next();
@@ -98,7 +125,19 @@ public class AdminMode extends AbstractMode {
 		operate();
 	}
 
-	private void registerDoctor() {
+	public void addReceptionist(){
+		operate();
+	}
+
+	public void deleteReceptionist(){
+		operate();
+	}
+
+	public void listReceptionist(){
+		operate();
+	}
+
+	public void registerDoctor() {
 		Scanner scan = scanner();
 		println("-----------------------------------------");
 		println("********** ENTER DOCTOR DETAILS *********");
@@ -127,7 +166,7 @@ public class AdminMode extends AbstractMode {
 		doctor.setSpecialization(specialization);
 		doctor.setExperience(experience);
 
-		save(doctor);
+		db.save(doctor);
 
 		if (exists(doctor)) {
 			println("Doctor registration done successfully");

@@ -13,13 +13,13 @@ public class User {
 	private int age;
 	private String type;
 	
-	public User(String userid, String pwd, String type, String name, int age) {
-		this.userid = userid;
-		this.pwd = pwd;
-		this.type = type;
-		this.name = name;
-		this.age = age;
-	}
+//	public User(String userid, String pwd, String type, String name, int age) {
+//		this.userid = userid;
+//		this.pwd = pwd;
+//		this.type = type;
+//		this.name = name;
+//		this.age = age;
+//	}
 
 	public String getUserid() {
 		return userid;
